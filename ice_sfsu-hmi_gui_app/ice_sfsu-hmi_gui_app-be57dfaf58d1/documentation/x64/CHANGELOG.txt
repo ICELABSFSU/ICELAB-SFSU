@@ -1,0 +1,49 @@
+[0.6] - 2016-04-22
+	-Added EMG file playback
+	-Added EMG file classification
+	-LDA can now accept a jagged training dataset, trims excess data to get
+		a rectangular dataset
+	-Added restriction against mulitple instances of the program
+	-Added status bar
+	-Cleaned up user interface
+	-Bug fixes:
+		-Fixed startup crash when Myo Connect is not running
+		-Fixed feature extraction windowing
+		-Fixed deleting raw training data when clicking "Clear samples"
+		-Fixed synchronization issues on DataAgent
+		-Fixed synchronization issues on FeatureCalculator
+		-Minor bug fixes
+
+[0.5] - 2016-04-04
+	-Added confusion matrix output when creating a classification model
+		(not implemented for LDA)
+	-Minor bug fixes
+
+[0.4] - 2016-04-01
+	-Added LDA classifier
+	-Added controls for gesture cueing
+	-Added special flag (-1) to represent a 'null' gesture state
+	-Added magnitude value to pipe message packet
+	-Fixed gesture renaming
+	-Fixed model load/save
+	-Fixed training data bugs
+	-Minor bug fixes
+
+[0.3] - 2016-03-28
+	-Added timestamps to all data points (last column when printed)
+	-Decision recording was changed to match a decision with its feature
+		window instead of raw EMG data
+	-Classifier can now handle multiple (max 4) pipe clients
+	-Minor bug fixes
+
+[0.2.1] - 2016-03-14
+	-Fixed program hang when stopping the classifier
+	-Fixed print formatting of decision recording
+
+[0.2] - 2016-03-11
+	-Improved raw input recording interface
+	-Data flags can now be set either by 'Set Flag' under Recording or by
+		clicking a gesture row under Classifier Gesture
+	-Added options to the Classifier interface to customize LIBSVM
+	-Added named output pipe "ICEClassifier" for any listening processes
+	-Minor bug fix in feature calculation

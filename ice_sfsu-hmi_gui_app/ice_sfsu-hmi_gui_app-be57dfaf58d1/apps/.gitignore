@@ -1,0 +1,9 @@
+**Debug/
+**Release/
+test_runs/
+.vs/
+*.*sdf
+*.suo*
+/*.txt
+*.VC.db
+*.VC.VC.opendb
