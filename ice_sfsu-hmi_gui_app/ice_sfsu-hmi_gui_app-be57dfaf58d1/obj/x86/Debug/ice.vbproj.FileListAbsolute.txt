@@ -1,3 +1,0 @@
-C:\Users\NECRL\Desktop\ali\ice\ice_sfsu-hmi_gui_app-be57dfaf58d1\ice_sfsu-hmi_gui_app-be57dfaf58d1\obj\x86\Debug\ice.vbprojResolveAssemblyReference.cache
-C:\Users\NECRL\Desktop\ali\ice\ice_sfsu-hmi_gui_app-be57dfaf58d1\ice_sfsu-hmi_gui_app-be57dfaf58d1\obj\x86\Debug\ice.MyForm.resources
-C:\Users\NECRL\Desktop\ali\ice\ice_sfsu-hmi_gui_app-be57dfaf58d1\ice_sfsu-hmi_gui_app-be57dfaf58d1\obj\x86\Debug\ice.vbproj.GenerateResource.Cache

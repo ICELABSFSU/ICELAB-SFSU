@@ -137,13 +137,13 @@ void GestureOutput::mapKey(int index, char key)
 	gestureOutput[index] = control;
 }
 
-void GestureOutput::mapBit(int index, int bit)
+/*void GestureOutput::mapBit(int index, int bit)
 {
 	ControlMapping control;
 	control.joy = 0;
 	control.bit = bit;
 	gestureOutput[index] = control;
-}
+}*/
 
 void GestureOutput::mapButton(int index, int button)
 {

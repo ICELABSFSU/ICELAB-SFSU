@@ -974,11 +974,20 @@ void Myo_app::MyForm::checkPipeClientAcknowledge(unsigned char ack) {
 }
 
 void Myo_app::MyForm::updatePipe() {
+
+	/*if (pipelineControlScheme == 0) {
+		nps->changeBit(cl->getLatestPrediction(), 1); // Set the bit for the latest prediction
+	}
+	else {
+		//if (cl->getLatestPrediction() != prevPrediction)
+			//nps->changeBit(cl->getLatestPrediction(), 1); // Set the bit for the latest prediction
+	}*/
 	nps->sendValue(cl->getLatestPrediction(), fc.getFeatureAverage(0));
 	labelPipeClientAcknowledge->Text = L"" + nps->getAcknowledge();
 	checkPipeClientAcknowledge(nps->getAcknowledge());
 
-	nps->flushByte();
+	nps->flushByte(); // reset byte to 0x00
+	prevPrediction = cl->getLatestPrediction(); // Update the previous prediction from the classifier
 }
 
 [STAThread]

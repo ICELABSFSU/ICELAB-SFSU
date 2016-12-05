@@ -42,5 +42,7 @@ public:
 	bool checkBit(int);
 	// Flush the byte
 	void flushByte();
+	// for testing
+	bool hasByteChanged();
 };
 

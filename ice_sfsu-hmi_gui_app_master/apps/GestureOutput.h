@@ -13,7 +13,7 @@ struct ControlMapping {
 	int range;	//set if mapped continuous range
 	union {
 		char key;	//keyboard key
-		int bit;	// ?
+		//int bit;	// ?
 		int value;	//for joy, button index/axis value
 		struct {
 			float scalar;	//for axis range
@@ -46,7 +46,7 @@ public:
 	void setMousePos(int x, int y);
 
 	void mapKey(int index, char key);
-	void mapBit(int index, int bit);
+	//void mapBit(int index, int bit);
 	void mapButton(int index, int button);
 	void mapAxisValue(int index, int axis, int value);
 	void mapAxisRange(int index, int axis, float lower, float upper);

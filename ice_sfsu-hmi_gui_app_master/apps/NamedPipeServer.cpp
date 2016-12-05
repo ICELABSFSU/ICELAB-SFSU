@@ -1,4 +1,7 @@
 #include "NamedPipeServer.h"
+#include <windows.h>
+//#include <iostream>
+//using namespace std;
 
 void NamedPipeServer::ServerThread()
 {
@@ -19,7 +22,7 @@ void NamedPipeServer::ServerThread()
 			//send-receive loop
 			try
 			{
-				array<unsigned char>^ pack = { (unsigned char)value , (unsigned char)mag , };
+				array<unsigned char>^ pack = { (unsigned char)value , (unsigned char)mag , (unsigned char)bitArray };
 				pipeServer->Write(pack, 0, pack->Length);
 				pipeServer->Read(response, 0, 80);
 
@@ -121,8 +124,12 @@ void NamedPipeServer::flushByte() {
 	bitArray = 0x00;
 }
 
-
-
+bool NamedPipeServer::hasByteChanged() {
+	if (prevBitArray != bitArray)
+		return 1;
+	else
+		return 0;
+}
 
 
 

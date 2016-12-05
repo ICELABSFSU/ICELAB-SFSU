@@ -531,9 +531,6 @@ private: System::Windows::Forms::Button^  buttonLoadVR;
 private: System::Windows::Forms::GroupBox^  groupBoxPipelineControlOptions;
 private: System::Windows::Forms::RadioButton^  radioButtonContinuous;
 private: System::Windows::Forms::RadioButton^  radioButtonOnTransitionAndPeak;
-private: System::Windows::Forms::TextBox^  textBoxAli;
-private: System::Windows::Forms::Button^  buttonAli;
-
 
 
 
@@ -570,7 +567,9 @@ private: System::Windows::Forms::Button^  buttonAli;
 
 		void checkPipeClientAcknowledge(unsigned char ack);
 		void updatePipe();
-		int pipelineControlSceme = 0; // 0: continuous (default), 1: on transition
+		//int pipelineControlScheme = 1; // 0: continuous, 1: on transition (default)
+		int prevPrediction = -1;
+		//int currentPrediction = -1;
 
 		InertialNavDisplay navdisplay;
 		//conjugate quaternion of centered orientation
@@ -968,8 +967,6 @@ private: System::Windows::Forms::Button^  buttonAli;
 			this->toolStripStatusLabelDataSourceStatus = (gcnew System::Windows::Forms::ToolStripStatusLabel());
 			this->toolStripStatusLabelSeparator = (gcnew System::Windows::Forms::ToolStripStatusLabel());
 			this->toolStripStatusLabelStatus = (gcnew System::Windows::Forms::ToolStripStatusLabel());
-			this->buttonAli = (gcnew System::Windows::Forms::Button());
-			this->textBoxAli = (gcnew System::Windows::Forms::TextBox());
 			this->tabPageOutput->SuspendLayout();
 			this->tableLayoutPanelOutput->SuspendLayout();
 			this->flowLayoutPanelOutput->SuspendLayout();
@@ -1146,7 +1143,7 @@ private: System::Windows::Forms::Button^  buttonAli;
 			// radioButtonContinuous
 			// 
 			this->radioButtonContinuous->AutoSize = true;
-			this->radioButtonContinuous->Checked = true;
+			this->radioButtonContinuous->Checked = false;
 			this->radioButtonContinuous->Location = System::Drawing::Point(6, 19);
 			this->radioButtonContinuous->Name = L"radioButtonContinuous";
 			this->radioButtonContinuous->Size = System::Drawing::Size(78, 17);
@@ -1159,6 +1156,7 @@ private: System::Windows::Forms::Button^  buttonAli;
 			// radioButtonOnTransitionAndPeak
 			// 
 			this->radioButtonOnTransitionAndPeak->AutoSize = true;
+			this->radioButtonOnTransitionAndPeak->Checked = true;
 			this->radioButtonOnTransitionAndPeak->Location = System::Drawing::Point(6, 42);
 			this->radioButtonOnTransitionAndPeak->Name = L"radioButtonOnTransitionAndPeak";
 			this->radioButtonOnTransitionAndPeak->Size = System::Drawing::Size(125, 17);
@@ -2332,7 +2330,6 @@ private: System::Windows::Forms::Button^  buttonAli;
 			this->buttonAddGesture->Text = L"Add";
 			this->buttonAddGesture->UseVisualStyleBackColor = true;
 			this->buttonAddGesture->Click += gcnew System::EventHandler(this, &MyForm::buttonAddGesture_Click);
-
 			// 
 			// buttonTrainGesture
 			// 
@@ -3845,8 +3842,6 @@ private: System::Windows::Forms::Button^  buttonAli;
 			// 
 			// tabPage4
 			// 
-			this->tabPage4->Controls->Add(this->textBoxAli);
-			this->tabPage4->Controls->Add(this->buttonAli);
 			this->tabPage4->Controls->Add(this->groupBoxSSorTrans);
 			this->tabPage4->Controls->Add(this->groupBox3);
 			this->tabPage4->Controls->Add(this->groupBoxOrPitch);
@@ -4330,33 +4325,6 @@ private: System::Windows::Forms::Button^  buttonAli;
 			this->toolStripStatusLabelStatus->Name = L"toolStripStatusLabelStatus";
 			this->toolStripStatusLabelStatus->Size = System::Drawing::Size(0, 17);
 			// 
-			// buttonAli
-			// 
-			this->buttonAli->Location = System::Drawing::Point(463, 326);
-			this->buttonAli->Name = L"buttonAli";
-			this->buttonAli->Size = System::Drawing::Size(105, 26);
-			this->buttonAli->TabIndex = 145;
-			this->buttonAli->Text = L"Add";
-			this->buttonAli->UseVisualStyleBackColor = true;
-
-			this->buttonAli->Click += gcnew System::EventHandler(this, &MyForm::buttonAli_Click);
-
-			
-
-
-			// 
-			// textBoxAli
-			// 
-			this->textBoxAli->BackColor = System::Drawing::SystemColors::Window;
-			this->textBoxAli->Location = System::Drawing::Point(594, 330);
-			this->textBoxAli->Name = L"textBoxAli";
-			this->textBoxAli->ReadOnly = true;
-			this->textBoxAli->Size = System::Drawing::Size(100, 20);
-			this->textBoxAli->TabIndex = 146;
-			//this->textBoxAli->Text = L"none" 
-			//this->textBoxAli->ValueChanged += gcnew System::EventHandler(this, &MyForm::buttonAli_Click);
-			//this->textBoxAli->KeyPress += gcnew System::Windows::Forms::KeyPressEventHandler(this, &MyForm::buttonAli_Click);
-			// 
 			// MyForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
@@ -4457,7 +4425,6 @@ private: System::Windows::Forms::Button^  buttonAli;
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->numericUpDownRecordingFlag))->EndInit();
 			this->tabControl1->ResumeLayout(false);
 			this->tabPage4->ResumeLayout(false);
-			this->tabPage4->PerformLayout();
 			this->groupBoxSSorTrans->ResumeLayout(false);
 			this->groupBoxSSorTrans->PerformLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->numericUpDownSSorTransWinsize))->EndInit();
@@ -4941,16 +4908,27 @@ private: System::Windows::Forms::Button^  buttonAli;
 		//}
 				if (sf.hasSwOccured()) {
 					swingcount++;
+					nps->changeBit(7, 1); // Set bit 7 to indicate that an arm swing has occured
 				}
 				textBoxSwingCount->Text = "" + swingcount;
 
 				if (mpf.hasPkOccured()) {
 					radioButtonMMAVPk->Checked = true;
+					// Update the pipe, when radio button is selected and latestPrediction() == 0
+					if (classify)
+					{
+						if (cl->getLatestPrediction() == 0)
+							nps->changeBit(0, 1);
+					}
+
 				}
 				else radioButtonMMAVPk->Checked = false;
 
 				if (sst.hasEnteredStedayState()) {
 					radioButtonTransition->Checked = true;
+					// Update the pipe
+					if (classify)
+						nps->changeBit(cl->getLatestPrediction(), 1);
 				}
 				else radioButtonTransition->Checked = false;
 	}
@@ -5012,22 +4990,7 @@ private: System::Windows::Forms::Button^  buttonAli;
 			addGesture(textBox14->Text);
 		}
 	}
-			//////////////////////////////////////////////////////////////////////
-			 int i01 = 0;
-				private: System::Void buttonAli_Click(System::Object^  sender, System::EventArgs^  e) {
-					//"Add" in classifier
-					
-					textBoxAli->Text = "" + ct.getSampleCount();
 
-					if (textBoxAli->Text != "")
-						i01++;
-					textBoxAli->Text = "" + i01;
-
-				}
-				
-
-
-				//////////////////////////////////////////////////////////////////////
 
 	private: System::Void gesture_KeyPress(System::Object^  sender, System::Windows::Forms::KeyPressEventArgs^  e) {
 				 //carriage return keypress
@@ -6124,12 +6087,13 @@ private: System::Void numericUpDownMMAVThresh_ValueChanged(System::Object^  send
 
 private: System::Void buttonBitAssignment_Click(System::Object^  sender, System::EventArgs^  e) {
 	SetBitOutputDialog^ form = gcnew SetBitOutputDialog();
-	if (form->ShowDialog() == System::Windows::Forms::DialogResult::OK)
+	/*if (form->ShowDialog() == System::Windows::Forms::DialogResult::OK)
 	{
-		//go.mapBit(comboBoxOutputGestureSelect->SelectedIndex, (int)form->bit);
-	}
+		go.mapBit(comboBoxOutputGestureSelect->SelectedIndex, (int)form->bit);
+	}*/
 	delete form;
 }
+
 private: System::Void buttonLoadVR_Click(System::Object^  sender, System::EventArgs^  e) {
 	// Default bit-gesture assignments for VR game output
 	// Gesture index 0 -> bit 0
@@ -6139,11 +6103,12 @@ private: System::Void buttonLoadVR_Click(System::Object^  sender, System::EventA
 	/*for(int i = 0; i < 7; i++)
 		go.mapBit(i, i);*/
 }
+
 private: System::Void radioButtonContinuous_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
-	if (radioButtonContinuous->Checked)
-		pipelineControlSceme = 0; // continuous stream 
+	/*if (radioButtonContinuous->Checked)
+		pipelineControlScheme = 0; // continuous stream 
 	else
-		pipelineControlSceme = 1; // on transition + mmav peak
+		pipelineControlScheme = 1; // on transition + mmav peak*/
 }
 };
 

@@ -10,7 +10,7 @@ class Classifier :
 	public DataAgent
 {
 protected:
-	int latestPrediction;
+	int latestPrediction = -1;
 public:
 	Classifier();
 	virtual ~Classifier();
